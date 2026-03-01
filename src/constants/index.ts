@@ -77,15 +77,15 @@ export const CLOUDINARY_UPLOAD_PRESET = getEnvVar("VITE_CLOUDINARY_UPLOAD_PRESET
 
 export const teachers = [
     {
-        id: "1",
+        id: 1,
         name: "John Doe",
     },
     {
-        id: "2",
+        id: 2,
         name: "Jane Smith",
     },
     {
-        id: "3",
+        id: 3,
         name: "Dr. Alan Turing",
     },
 ];
