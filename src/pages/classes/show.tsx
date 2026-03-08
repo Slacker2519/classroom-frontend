@@ -38,7 +38,7 @@ const Show = () => {
             .map((part) => part[0]?.toUpperCase())
             .join('');
 
-    const placeholderUrl = `https://placeholder.co/600x400?text=${encodeURIComponent(teachersInitials || 'NA')}`;
+    const placeholderUrl = `https://placehold.co/600x400?text=${encodeURIComponent(teachersInitials || 'NA')}`;
 
     const {
         name,
@@ -57,7 +57,7 @@ const Show = () => {
             <ShowViewHeader resource="classes" title="Class Details" />
 
             <div className="banner">
-                {bannerUrl ? (
+                {bannerCldPubId ? (
                     <AdvancedImage
                         alt="Class Banner"
                         cldImg={bannerPhoto(bannerCldPubId ?? '', name)}
@@ -75,8 +75,8 @@ const Show = () => {
 
                     <div>
                         <Badge variant="outline">{capacity} spots</Badge>
-                        <Badge variant={status == 'active' ? 'default' : 'secondary'} data-status={status}>
-                            {status.toUpperCase()}
+                        <Badge variant={status === 'active' ? 'default' : 'secondary'} data-status={status ?? 'unknown'}>
+                            {(status ?? 'unknown').toUpperCase()}
                         </Badge>
                     </div>
                 </div>
