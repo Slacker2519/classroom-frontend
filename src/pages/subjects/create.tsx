@@ -95,6 +95,25 @@ const Create = () => {
                                     )}
                                 />
 
+                                <FormField
+                                    control={control}
+                                    name="code"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>
+                                                Subject Code <span className="text-orange-600">*</span>
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Subject code"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
                                 <div className="grid sm:grid-cols-1 gap-4">
                                     <FormField
                                         control={control}
@@ -105,10 +124,8 @@ const Create = () => {
                                                     Department <span className="text-orange-600">*</span>
                                                 </FormLabel>
                                                 <Select
-                                                    onValueChange={(value) =>
-                                                        field.onChange(Number(value))
-                                                    }
-                                                    value={field.value?.toString()}
+                                                    onValueChange={field.onChange}
+                                                    value={field.value}
                                                     disabled={departmentsLoading}
                                                 >
                                                     <FormControl>
@@ -151,7 +168,7 @@ const Create = () => {
 
                                     <Separator />
 
-                                    <Button type="submit" size="lg" className="w-full">
+                                    <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
                                         {isSubmitting ? (
                                             <div className="flex gap-1">
                                                 <span>Creating Subject...</span>
