@@ -241,7 +241,7 @@ const Create = () => {
                                         name="capacity"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Capacity</FormLabel>
+                                                <FormLabel>Capacity <span className="text-orange-600">*</span></FormLabel>
                                                 <FormControl>
                                                     <Input
                                                         type="number"
