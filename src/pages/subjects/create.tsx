@@ -1,19 +1,19 @@
 import {useBack, useList} from "@refinedev/core";
 import {useForm} from "@refinedev/react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {classSchema, subjectSchema} from "@/lib/schema.ts";
-import {Department, Subject} from "@/types";
+import {subjectSchema} from "@/lib/schema.ts";
+import {Department} from "@/types";
 import * as z from "zod";
 import {CreateView} from "@/components/refine-ui/views/create-view.tsx";
 import {Breadcrumb} from "@/components/refine-ui/layout/breadcrumb.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {Separator} from "@radix-ui/react-select";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {Input} from "@/components/ui/input.tsx";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {Loader2} from "lucide-react";
+import {Separator} from "@/components/ui/separator.tsx";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 
 const Create = () => {
     const back = useBack();
@@ -117,7 +117,7 @@ const Create = () => {
                                 <div className="grid sm:grid-cols-1 gap-4">
                                     <FormField
                                         control={control}
-                                        name="department"
+                                        name="departmentId"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>
@@ -125,7 +125,7 @@ const Create = () => {
                                                 </FormLabel>
                                                 <Select
                                                     onValueChange={field.onChange}
-                                                    value={field.value}
+                                                    value={field.value?.toString()}
                                                     disabled={departmentsLoading}
                                                 >
                                                     <FormControl>
@@ -188,4 +188,4 @@ const Create = () => {
     );
 };
 
-export default Create
+export default Create;
