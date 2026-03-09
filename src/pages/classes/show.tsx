@@ -45,7 +45,6 @@ const Show = () => {
         description,
         status,
         capacity,
-        bannerUrl,
         bannerCldPubId,
         subject,
         teacher,
