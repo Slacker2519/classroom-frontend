@@ -3,6 +3,9 @@ import { BACKEND_BASE_URL } from "@/constants";
 
 export const authClient = createAuthClient({
     baseURL: BACKEND_BASE_URL,
+    fetchOptions: {
+        credentials: "include",
+    }
 });
 
 export const { signIn, signUp, signOut, useSession } = authClient;
