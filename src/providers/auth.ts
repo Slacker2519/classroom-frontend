@@ -82,20 +82,30 @@ export const authProvider: AuthProvider = {
         };
     },
     getPermissions: async () => {
-        const { data: session } = await authClient.getSession();
-        if (session) {
-            return (session.user as any).role;
+        try {
+            const { data: session } = await authClient.getSession();
+            if (session) {
+                return (session.user as any).role;
+            }
+        } catch (e) {
+            // Ignore session check errors
         }
+
         return null;
     },
     getIdentity: async () => {
-        const { data: session } = await authClient.getSession();
-        if (session) {
-            return {
-                ...session.user,
-                avatar: session.user.image,
-            };
+        try {
+            const { data: session } = await authClient.getSession();
+            if (session) {
+                return {
+                    ...session.user,
+                    avatar: session.user.image,
+                };
+            }
+        } catch (e) {
+            // Ignore session check errors
         }
+
         return null;
     },
     onError: async (error) => {
