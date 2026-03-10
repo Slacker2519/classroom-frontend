@@ -21,6 +21,12 @@ import ClassesList from "@/pages/classes/list.tsx";
 import ClassesCreate from "@/pages/classes/create.tsx";
 import ClassesShow from "@/pages/classes/show.tsx";
 
+import { authProvider } from "./providers/auth.ts";
+import LoginPage from "./pages/login.tsx";
+import RegisterPage from "./pages/register.tsx";
+import { Authenticated } from "@refinedev/core";
+import { CatchAllNavigate } from "@refinedev/react-router";
+
 function App() {
   return (
     <BrowserRouter>
@@ -29,6 +35,7 @@ function App() {
           <DevtoolsProvider>
             <Refine
               dataProvider={dataProvider}
+              authProvider={authProvider}
               notificationProvider={useNotificationProvider()}
               routerProvider={routerProvider}
               options={{
@@ -58,8 +65,19 @@ function App() {
               ]}
             >
               <Routes>
-                  <Route element={ <Layout><Outlet /></Layout> }>
-                    <Route path="/" element={<Dashboard />} />
+                  <Route
+                      element={
+                          <Authenticated
+                              key="authenticated-inner"
+                              fallback={<CatchAllNavigate to="/login" />}
+                          >
+                              <Layout>
+                                  <Outlet />
+                              </Layout>
+                          </Authenticated>
+                      }
+                  >
+                      <Route path="/" element={<Dashboard />} />
 
                       <Route path="subjects">
                           <Route index element={<SubjectsList />} />
@@ -71,6 +89,17 @@ function App() {
                           <Route path="create" element={<ClassesCreate />} />
                           <Route path="show/:id" element={<ClassesShow />} />
                       </Route>
+                  </Route>
+
+                  <Route
+                      element={
+                          <Authenticated key="auth-pages" fallback={<Outlet />}>
+                              <CatchAllNavigate to="/" />
+                          </Authenticated>
+                      }
+                  >
+                      <Route path="/login" element={<LoginPage />} />
+                      <Route path="/register" element={<RegisterPage />} />
                   </Route>
               </Routes>
               <Toaster />
