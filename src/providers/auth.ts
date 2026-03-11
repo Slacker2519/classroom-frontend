@@ -63,7 +63,6 @@ export const authProvider: AuthProvider = {
     check: async () => {
         try {
             const { data: session } = await authClient.getSession();
-            console.log("Session check: ", session);
             if (session) {
                 return {
                     authenticated: true,
