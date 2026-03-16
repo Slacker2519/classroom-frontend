@@ -112,3 +112,35 @@ export const subjects = [
         code: "CHEM",
     },
 ];
+
+const SEED_DATA = {
+    admin: {
+        name: "Admin",
+        email: "admin@school.com",
+        password: "AdminPass123"
+    },
+    teachers: [
+        { name: "John Smith", email: "teacher1@school.com", password: "TeacherPass123" },
+        { name: "Jane Doe", email: "teacher2@school.com", password: "TeacherPass123" },
+        { name: "Mr. Johnson", email: "teacher3@school.com", password: "TeacherPass123" },
+    ],
+    students: [
+        { name: "Alice Brown", email: "student1@school.com", password: "StudentPass123" },
+        { name: "Bob Wilson", email: "student2@school.com", password: "StudentPass123" },
+        { name: "Charlie Lee", email: "student3@school.com", password: "StudentPass123" },
+        { name: "Diana Garcia", email: "student4@school.com", password: "StudentPass123" },
+        { name: "Evan Martinez", email: "student5@school.com", password: "StudentPass123" },
+    ],
+    departments: [
+        { code: "SCI", name: "Science", description: "Science department" },
+        { code: "ARTS", name: "Arts", description: "Arts and Humanities department" },
+    ],
+    subjects: [
+        { code: "MATH", name: "Mathematics", description: "Math course", deptCode: "SCI" },
+        { code: "PHYS", name: "Physics", description: "Physics course", deptCode: "SCI" },
+        { code: "CHEM", name: "Chemistry", description: "Chemistry course", deptCode: "SCI" },
+        { code: "HIST", name: "History", description: "History course", deptCode: "ARTS" },
+        { code: "ENG", name: "English", description: "English course", deptCode: "ARTS" },
+        { code: "ART", name: "Art", description: "Art course", deptCode: "ARTS" },
+    ],
+};
