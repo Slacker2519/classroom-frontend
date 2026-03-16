@@ -10,13 +10,18 @@ import {useTable} from "@refinedev/react-table";
 import {ClassDetails, Subject, User} from "@/types";
 import {ColumnDef} from "@tanstack/react-table";
 import {Badge} from "@/components/ui/badge.tsx";
-import {useList} from "@refinedev/core";
+import {useList, useGetIdentity} from "@refinedev/core";
 import {ShowButton} from "@/components/refine-ui/buttons/show.tsx";
+import {hasPermission, RoleName} from "@/lib/permissions";
 
 const ClassesList = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('all');
     const [selectedTeacher, setSelectedTeacher] = useState('all');
+
+    const { data: identity } = useGetIdentity<{ role?: RoleName }>();
+    const userRole = identity?.role;
+    const canCreateClass = userRole ? hasPermission(userRole, "class:create") : false;
 
     const { query: subjectsQuery } = useList<Subject>({
         resource: 'subjects',
@@ -185,7 +190,7 @@ const ClassesList = () => {
                             </SelectContent>
                         </Select>
                     </div>
-                    <CreateButton resource="classes" />
+                    {canCreateClass && <CreateButton resource="classes" />}
                 </div>
             </div>
 

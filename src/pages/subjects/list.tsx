@@ -11,10 +11,17 @@ import {Subject} from "@/types";
 import {ColumnDef} from "@tanstack/react-table";
 import {Badge} from "@/components/ui/badge.tsx";
 import {DataTable} from "@/components/refine-ui/data-table/data-table.tsx";
+import {useGetIdentity} from "@refinedev/core";
+import {hasPermission, RoleName} from "@/lib/permissions";
 
 const SubjectsList = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedDepartment, setSelectedDepartment] = useState('all');
+
+    // Get user identity to check role
+    const { data: identity } = useGetIdentity<{ role?: RoleName }>();
+    const userRole = identity?.role;
+    const canCreateSubject = userRole ? hasPermission(userRole, "subject:create") : false;
 
     const departmentFilters = selectedDepartment === 'all' ? [] : [
         { field: 'department', operator: 'eq' as const, value: selectedDepartment }
@@ -121,7 +128,7 @@ const SubjectsList = () => {
                             </SelectContent>
                         </Select>
 
-                        <CreateButton />
+                        {canCreateSubject && <CreateButton />}
                     </div>
                 </div>
             </div>
