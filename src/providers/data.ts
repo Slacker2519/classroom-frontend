@@ -91,6 +91,7 @@ const options: CreateDataProviderOptions = {
 }
 
 const customFetch: typeof fetch = async (url, options = {}) => {
+    console.log("Fetching:", url, "credentials:", options.credentials);
     return fetch(url, {
         ...options,
         credentials: "include",
