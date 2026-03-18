@@ -1,5 +1,5 @@
 import {createDataProvider, CreateDataProviderOptions} from "@refinedev/rest";
-import {BACKEND_BASE_URL} from "@/constants";
+import { BACKEND_BASE_URL } from "@/constants";
 import {CreateResponse, GetOneResponse, ListResponse} from "@/types";
 import {HttpError} from "@refinedev/core";
 
@@ -22,7 +22,7 @@ const buildHttpError = async (response: Response): Promise<HttpError> => {
 
 const options: CreateDataProviderOptions = {
     getList: {
-        getEndpoint: ({ resource }) => resource,
+        getEndpoint: ({ resource }) => `api/${resource}`,
 
         buildQueryParams: async ({ resource, pagination, filters }) => {
             const page = pagination?.currentPage ?? 1;
@@ -68,7 +68,7 @@ const options: CreateDataProviderOptions = {
     },
 
     create: {
-        getEndpoint: ({ resource }) => resource,
+        getEndpoint: ({ resource }) => `api/${resource}`,
 
         buildBodyParams: async ({ variables }) => variables,
 
@@ -80,7 +80,7 @@ const options: CreateDataProviderOptions = {
     },
 
     getOne: {
-        getEndpoint: ({ resource, id }) => `${resource}/${id}`,
+        getEndpoint: ({ resource, id }) => `api/${resource}/${id}`,
 
         mapResponse: async (response) => {
             if (!response.ok) throw await buildHttpError(response);
@@ -92,6 +92,14 @@ const options: CreateDataProviderOptions = {
     }
 }
 
-const { dataProvider } = createDataProvider(BACKEND_BASE_URL, options);
+// Create a custom fetch function that includes credentials
+const customFetch: typeof fetch = async (url, options = {}) => {
+    return fetch(url, {
+        ...options,
+        credentials: "include", // This sends cookies with the request
+    });
+};
+
+const { dataProvider } = createDataProvider(BACKEND_BASE_URL, options, customFetch);
 
 export { dataProvider };
