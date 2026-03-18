@@ -92,11 +92,10 @@ const options: CreateDataProviderOptions = {
     }
 }
 
-// Create a custom fetch function that includes credentials
 const customFetch: typeof fetch = async (url, options = {}) => {
     return fetch(url, {
         ...options,
-        credentials: "include", // This sends cookies with the request
+        credentials: "include",
     });
 };
 
