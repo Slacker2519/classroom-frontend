@@ -70,12 +70,10 @@ const options: CreateDataProviderOptions = {
     create: {
         getEndpoint: ({ resource }) => `api/${resource}`,
 
-        buildBodyParams: async ({ variables }) => variables,
-
         mapResponse: async (response) => {
-            const json: CreateResponse = await response.json();
+            const json: CreateResponse = await response.clone().json();
 
-            return json.data ?? [];
+            return json.data ?? {};
         }
     },
 
@@ -85,9 +83,9 @@ const options: CreateDataProviderOptions = {
         mapResponse: async (response) => {
             if (!response.ok) throw await buildHttpError(response);
 
-            const json: GetOneResponse = await response.json();
+            const json: GetOneResponse = await response.clone().json();
 
-            return json.data ?? [];
+            return json.data ?? {};
         }
     }
 }
