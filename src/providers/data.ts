@@ -1,7 +1,7 @@
 import {createDataProvider, CreateDataProviderOptions} from "@refinedev/rest";
 import { BACKEND_BASE_URL } from "@/constants";
 import {CreateResponse, GetOneResponse, ListResponse} from "@/types";
-import {HttpError} from "@refinedev/core";
+import {HttpError, UpdateResponse} from "@refinedev/core";
 
 const buildHttpError = async (response: Response): Promise<HttpError> => {
     let message = 'Request failed';
@@ -71,7 +71,32 @@ const options: CreateDataProviderOptions = {
         getEndpoint: ({ resource }) => `api/${resource}`,
 
         mapResponse: async (response) => {
+            if (!response.ok) throw await buildHttpError(response);
+
             const json: CreateResponse = await response.clone().json();
+
+            return json.data ?? {};
+        }
+    },
+
+    update: {
+        getEndpoint: ({ resource, id }) => `api/${resource}/${id}`,
+        mapResponse: async (response) => {
+            if (!response.ok) throw await buildHttpError(response);
+
+            const json: UpdateResponse = await response.clone().json();
+
+            return json.data ?? {};
+        }
+    },
+
+    deleteOne: {
+        getEndpoint: ({ resource, id }) => `api/${resource}/${id}`,
+
+        mapResponse: async (response) => {
+            if (!response.ok) return await buildHttpError(response);
+
+            const json = await response.clone().json();
 
             return json.data ?? {};
         }
@@ -87,17 +112,30 @@ const options: CreateDataProviderOptions = {
 
             return json.data ?? {};
         }
-    }
+    },
 }
 
 const customFetch: typeof fetch = async (url, options = {}) => {
-    console.log("Fetching:", url, "credentials:", options.credentials);
-    return fetch(url, {
+    console.log("[API Request]", options.method || "GET", url);
+
+    const response = await fetch(url, {
         ...options,
         credentials: "include",
+        headers: {
+            ...options.headers,
+        },
     });
+
+    if (!response.ok) {
+        console.error("[API Error", response.statusText, url);
+    }
+
+    return response;
 };
 
-const { dataProvider } = createDataProvider(BACKEND_BASE_URL, options, customFetch);
+const { dataProvider: baseDataProvider } = createDataProvider(BACKEND_BASE_URL, options, customFetch);
 
-export { dataProvider };
+export const dataProvider = {
+    ...baseDataProvider,
+    getApiUrl: () => BACKEND_BASE_URL,
+}
