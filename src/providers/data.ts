@@ -118,7 +118,7 @@ const options: CreateDataProviderOptions = {
 const customFetch: typeof fetch = async (url, options = {}) => {
   console.log("[customFetch] URL:", url);
   console.log("[customFetch] baseURL:", BACKEND_BASE_URL);
-  console.log("[API Request]", options.method || "GET", url);
+  console.log("[customFetch] credentials in options:", options.credentials);
 
   const response = await fetch(url, {
     ...options,
