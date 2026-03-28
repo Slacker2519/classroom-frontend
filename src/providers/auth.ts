@@ -85,82 +85,27 @@ export const authProvider: AuthProvider = {
   getPermissions: async () => {
     try {
       const { data: session } = await authClient.getSession();
-      if (session) {
-        // Get active organization from session
-        const sessionWithOrg = session as any;
-        const activeOrg = sessionWithOrg.activeOrganization;
-
-        if (activeOrg) {
-          // Get the member to find their role using the organization client
-          const orgClient = authClient.organization as any;
-          if (orgClient?.getMember) {
-            try {
-              const { data: member } = await orgClient.getMember({
-                organizationId: activeOrg.id,
-                memberId: session.user.id,
-              });
-              if (member) {
-                return member.role as RoleName;
-              }
-            } catch (e) {
-              // Member might not exist or API error
-              console.error("Error getting member:", e);
-            }
-          }
-        }
-        // Fallback to user.role (stored on user record)
-        return (session.user as any).role as RoleName;
-      }
+      if (!session) return null;
+      return (session.user as any).role as RoleName;
     } catch (e) {
       console.error("Error getting permissions:", e);
+      return null;
     }
-
-    return null;
   },
   getIdentity: async () => {
     try {
       const { data: session } = await authClient.getSession();
-      if (session) {
-        const user = session.user;
-
-        // Get active organization info
-        const sessionWithOrg = session as any;
-        const activeOrg = sessionWithOrg.activeOrganization;
-        let role: RoleName | undefined;
-        let organizationId: string | undefined;
-
-        if (activeOrg) {
-          organizationId = activeOrg.id;
-          // Get member to find role
-          try {
-            const orgClient = authClient.organization as any;
-            if (orgClient?.getMember) {
-              const { data: member } = await orgClient.getMember({
-                organizationId: activeOrg.id,
-                memberId: session.user.id,
-              });
-              if (member) {
-                role = member.role as RoleName;
-              }
-            }
-          } catch (e) {
-            // Member might not exist yet
-            console.error("Error getting member:", e);
-          }
-        }
-
-        return {
-          ...user,
-          avatar: user.image,
-          role: role || (user as any).role,
-          organizationId,
-        };
-      }
+      if (!session) return null;
+      const user = session.user;
+      return {
+        ...user,
+        avatar: user.image,
+        role: (user as any).role,
+      };
     } catch (e) {
       console.error("Error getting identity:", e);
+      return null;
     }
-
-    return null;
   },
   onError: async (error) => {
     if (error.status === 401 || error.status === 403) {
