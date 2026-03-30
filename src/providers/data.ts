@@ -115,27 +115,6 @@ const options: CreateDataProviderOptions = {
   },
 };
 
-// const customFetch: typeof fetch = async (url, options = {}) => {
-//   console.log("[customFetch called]", url);
-//   console.log("[customFetch options]", JSON.stringify(options));
-
-//   const response = await fetch(url, {
-//     ...options,
-//     credentials: "include",
-//     headers: {
-//       ...options.headers,
-//     },
-//   });
-
-//   // if (!response.ok) {
-//   //   console.error("[API Error", response.statusText, url);
-//   // }
-
-//   console.log("[customFetch response status]", response.status);
-
-//   return response;
-// };
-
 const { dataProvider: baseDataProvider } = createDataProvider(
   BACKEND_BASE_URL,
   options,

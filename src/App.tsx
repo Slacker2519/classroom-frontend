@@ -16,6 +16,7 @@ import { BookOpen, GraduationCap, Home } from "lucide-react";
 import { Layout } from "@/components/refine-ui/layout/layout.tsx";
 import SubjectsList from "@/pages/subjects/list.tsx";
 import SubjectsCreate from "@/pages/subjects/create.tsx";
+import SubjectsEdit from "@/pages/subjects/edit.tsx";
 import ClassesList from "@/pages/classes/list.tsx";
 import ClassesCreate from "@/pages/classes/create.tsx";
 import ClassesShow from "@/pages/classes/show.tsx";
@@ -51,6 +52,7 @@ function App() {
                 name: "subjects",
                 list: "/subjects",
                 create: "/subjects/create",
+                edit: "subjects/edit/:id",
                 meta: { label: "Subjects", icon: <BookOpen /> },
               },
               {
@@ -80,6 +82,7 @@ function App() {
                 <Route path="subjects">
                   <Route index element={<SubjectsList />} />
                   <Route path="create" element={<SubjectsCreate />} />
+                  <Route path="edit/:id" element={<SubjectsEdit />} />
                 </Route>
 
                 <Route path="classes">
