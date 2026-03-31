@@ -90,16 +90,17 @@ const SubjectsList = () => {
           id: "edit",
           accessorKey: "edit",
           header: () => <p className="column-title">Edit</p>,
-          cell: ({ row }) => (
-            <EditButton
-              resource="subjects"
-              recordItemId={row.original.id}
-              variant="outline"
-              size="sm"
-            >
-              Edit
-            </EditButton>
-          ),
+          cell: ({ row }) =>
+            canEditSubject && (
+              <EditButton
+                resource="subjects"
+                recordItemId={row.original.id}
+                variant="outline"
+                size="sm"
+              >
+                Edit
+              </EditButton>
+            ),
         },
       ],
       []
@@ -158,7 +159,6 @@ const SubjectsList = () => {
             </Select>
 
             {canCreateSubject && <CreateButton resource="subjects" />}
-            {canEditSubject && <EditButton resource="subjects" />}
           </div>
         </div>
       </div>
