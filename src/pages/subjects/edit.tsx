@@ -51,7 +51,7 @@ const Edit = () => {
     control,
   } = form;
 
-  const onSubmit = async (values: z.inferfer<typeof subjectSchema>) => {
+  const onSubmit = async (values: z.infer<typeof subjectSchema>) => {
     try {
       await onFinish(values);
     } catch (error) {
