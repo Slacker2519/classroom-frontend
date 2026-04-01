@@ -19,13 +19,14 @@ import { Badge } from "@/components/ui/badge.tsx";
 import { useList, useGetIdentity } from "@refinedev/core";
 import { ShowButton } from "@/components/refine-ui/buttons/show.tsx";
 import { hasPermission, RoleName } from "@/lib/permissions";
+import { EditButton } from "@/components/refine-ui/buttons/edit.tsx";
 
 const ClassesList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("all");
   const [selectedTeacher, setSelectedTeacher] = useState("all");
 
-  const { data: identity } = useGetIdentity<{ role?: RoleName }>();
+  const { data: identity } = useGetIdentity<{ role?: RoleName; id?: string }>();
   const userRole = identity?.role;
   const canCreateClass = userRole
     ? hasPermission(userRole, "class:create")
@@ -141,8 +142,30 @@ const ClassesList = () => {
           </ShowButton>
         ),
       },
+      {
+        id: "actions",
+        size: 100,
+        cell: ({ row }) => {
+          const classRecord = row.original;
+          const canEdit =
+            userRole === "admin" ||
+            (userRole === "teacher" &&
+              classRecord.teacher?.id === identity?.id);
+
+          if (!canEdit) return null;
+
+          return (
+            <EditButton
+              resource="classes"
+              recordItemId={classRecord.id}
+              variant="outline"
+              size="sm"
+            />
+          );
+        },
+      },
     ],
-    []
+    [userRole, identity]
   );
 
   const classTable = useTable<ClassDetails>({

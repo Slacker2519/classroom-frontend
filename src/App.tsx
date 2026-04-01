@@ -20,6 +20,7 @@ import SubjectsEdit from "@/pages/subjects/edit.tsx";
 import ClassesList from "@/pages/classes/list.tsx";
 import ClassesCreate from "@/pages/classes/create.tsx";
 import ClassesShow from "@/pages/classes/show.tsx";
+import ClassEdit from "@/pages/classes/edit.tsx";
 
 import { authProvider } from "./providers/auth.ts";
 import LoginPage from "./pages/login.tsx";
@@ -60,6 +61,7 @@ function App() {
                 list: "/classes",
                 create: "/classes/create",
                 show: "/classes/show/:id",
+                edit: "classes/edit/:id",
                 meta: { label: "Classes", icon: <GraduationCap /> },
               },
             ]}
@@ -89,6 +91,7 @@ function App() {
                   <Route index element={<ClassesList />} />
                   <Route path="create" element={<ClassesCreate />} />
                   <Route path="show/:id" element={<ClassesShow />} />
+                  <Route path="edit/:id" element={<ClassEdit />} />
                 </Route>
               </Route>
 
