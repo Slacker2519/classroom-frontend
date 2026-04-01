@@ -20,6 +20,7 @@ import { DataTable } from "@/components/refine-ui/data-table/data-table.tsx";
 import { useGetIdentity } from "@refinedev/core";
 import { hasPermission, RoleName } from "@/lib/permissions";
 import { EditButton } from "@/components/refine-ui/buttons/edit.tsx";
+import { DeleteButton } from "@/components/refine-ui/buttons/delete";
 
 const SubjectsList = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,6 +33,9 @@ const SubjectsList = () => {
     : false;
   const canEditSubject = userRole
     ? hasPermission(userRole, "subject:update")
+    : false;
+  const canDeleteSubject = userRole
+    ? hasPermission(userRole, "subject:delete")
     : false;
 
   const departmentFilters =
@@ -90,7 +94,6 @@ const SubjectsList = () => {
     if (canEditSubject) {
       cols.push({
         id: "edit",
-        header: () => <p className="column-title">Edit</p>,
         cell: ({ row }) => (
           <EditButton
             resource="subjects"
@@ -104,8 +107,22 @@ const SubjectsList = () => {
       });
     }
 
+    if (canDeleteSubject) {
+      cols.push({
+        id: "delete",
+        cell: ({ row }) => (
+          <DeleteButton
+            resource="subjects"
+            recordItemId={row.original.id}
+            variant="destructive"
+            size="sm"
+          />
+        ),
+      });
+    }
+
     return cols;
-  }, [canEditSubject]);
+  }, [canEditSubject, canDeleteSubject]);
 
   const subjectTable = useTable<Subject>({
     columns,
