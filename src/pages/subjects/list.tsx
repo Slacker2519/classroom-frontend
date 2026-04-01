@@ -48,63 +48,67 @@ const SubjectsList = () => {
     ? [{ field: "name", operator: "contains" as const, value: searchQuery }]
     : [];
 
+  const columns = useMemo<ColumnDef<Subject>[]>(() => {
+    const cols: ColumnDef<Subject>[] = [
+      {
+        id: "code",
+        accessorKey: "code",
+        size: 100,
+        header: () => <p className="column-title ml-2">Code</p>,
+        cell: ({ getValue }) => <Badge>{getValue<string>()}</Badge>,
+      },
+      {
+        id: "name",
+        accessorKey: "name",
+        size: 200,
+        header: () => <p className="column-title">Name</p>,
+        cell: ({ getValue }) => (
+          <span className="text-foreground">{getValue<string>()}</span>
+        ),
+        filterFn: "includesString",
+      },
+      {
+        id: "department",
+        accessorKey: "department.name",
+        size: 150,
+        header: () => <p className="column-title">Department</p>,
+        cell: ({ getValue }) => (
+          <Badge variant="secondary">{getValue<string>()}</Badge>
+        ),
+      },
+      {
+        id: "description",
+        accessorKey: "description",
+        size: 300,
+        header: () => <p className="column-title">Description</p>,
+        cell: ({ getValue }) => (
+          <span className="truncate line-clamp-2">{getValue<string>()}</span>
+        ),
+      },
+    ];
+
+    if (canEditSubject) {
+      cols.push({
+        id: "edit",
+        header: () => <p className="column-title">Edit</p>,
+        cell: ({ row }) => (
+          <EditButton
+            resource="subjects"
+            recordItemId={row.original.id}
+            variant="outline"
+            size="sm"
+          >
+            Edit
+          </EditButton>
+        ),
+      });
+    }
+
+    return cols;
+  }, [canEditSubject]);
+
   const subjectTable = useTable<Subject>({
-    columns: useMemo<ColumnDef<Subject>[]>(
-      () => [
-        {
-          id: "code",
-          accessorKey: "code",
-          size: 100,
-          header: () => <p className="column-title ml-2">Code</p>,
-          cell: ({ getValue }) => <Badge>{getValue<string>()}</Badge>,
-        },
-        {
-          id: "name",
-          accessorKey: "name",
-          size: 200,
-          header: () => <p className="column-title">Name</p>,
-          cell: ({ getValue }) => (
-            <span className="text-foreground">{getValue<string>()}</span>
-          ),
-          filterFn: "includesString",
-        },
-        {
-          id: "department",
-          accessorKey: "department.name",
-          size: 150,
-          header: () => <p className="column-title">Department</p>,
-          cell: ({ getValue }) => (
-            <Badge variant="secondary">{getValue<string>()}</Badge>
-          ),
-        },
-        {
-          id: "description",
-          accessorKey: "description",
-          size: 300,
-          header: () => <p className="column-title">Description</p>,
-          cell: ({ getValue }) => (
-            <span className="truncate line-clamp-2">{getValue<string>()}</span>
-          ),
-        },
-        {
-          id: "edit",
-          accessorKey: "edit",
-          header: () => <p className="column-title">Edit</p>,
-          cell: ({ row }) =>
-            canEditSubject && (
-              <EditButton
-                resource="subjects"
-                recordItemId={row.original.id}
-                variant="outline"
-                size="sm"
-              >
-                Edit
-              </EditButton>
-            ),
-        },
-      ],
-      []
-    ),
+    columns,
     refineCoreProps: {
       resource: "subjects",
       pagination: { pageSize: 10, mode: "server" },
