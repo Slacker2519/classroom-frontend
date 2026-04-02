@@ -156,7 +156,7 @@ const ClassesList = () => {
           if (!canModify) return null;
 
           return (
-            <div className="flex gap-2">
+            <div>
               <EditButton
                 resource="classes"
                 recordItemId={classRecord.id}

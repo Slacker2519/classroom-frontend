@@ -100,9 +100,7 @@ const SubjectsList = () => {
             recordItemId={row.original.id}
             variant="outline"
             size="sm"
-          >
-            Edit
-          </EditButton>
+          />
         ),
       });
     }
