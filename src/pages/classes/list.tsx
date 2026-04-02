@@ -148,28 +148,42 @@ const ClassesList = () => {
         size: 100,
         cell: ({ row }) => {
           const classRecord = row.original;
-          const canModify =
+          const canUpdate =
             userRole === "admin" ||
             (userRole === "teacher" &&
               classRecord.teacher?.id === identity?.id);
 
-          if (!canModify) return null;
+          if (!canUpdate) return null;
 
           return (
-            <div>
-              <EditButton
-                resource="classes"
-                recordItemId={classRecord.id}
-                variant="outline"
-                size="sm"
-              />
-              <DeleteButton
-                resource="classes"
-                recordItemId={classRecord.id}
-                variant="outline"
-                size="sm"
-              />
-            </div>
+            <EditButton
+              resource="classes"
+              recordItemId={classRecord.id}
+              variant="outline"
+              size="sm"
+            />
+          );
+        },
+      },
+      {
+        id: "actions",
+        size: 100,
+        cell: ({ row }) => {
+          const classRecord = row.original;
+          const canDelete =
+            userRole === "admin" ||
+            (userRole === "teacher" &&
+              classRecord.teacher?.id === identity?.id);
+
+          if (!canDelete) return null;
+
+          return (
+            <DeleteButton
+              resource="classes"
+              recordItemId={classRecord.id}
+              variant="outline"
+              size="sm"
+            />
           );
         },
       },
