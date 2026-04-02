@@ -20,6 +20,7 @@ import { useList, useGetIdentity } from "@refinedev/core";
 import { ShowButton } from "@/components/refine-ui/buttons/show.tsx";
 import { hasPermission, RoleName } from "@/lib/permissions";
 import { EditButton } from "@/components/refine-ui/buttons/edit.tsx";
+import { DeleteButton } from "@/components/refine-ui/buttons/delete.tsx";
 
 const ClassesList = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -147,20 +148,28 @@ const ClassesList = () => {
         size: 100,
         cell: ({ row }) => {
           const classRecord = row.original;
-          const canEdit =
+          const canModify =
             userRole === "admin" ||
             (userRole === "teacher" &&
               classRecord.teacher?.id === identity?.id);
 
-          if (!canEdit) return null;
+          if (!canModify) return null;
 
           return (
-            <EditButton
-              resource="classes"
-              recordItemId={classRecord.id}
-              variant="outline"
-              size="sm"
-            />
+            <div className="flex gap-2">
+              <EditButton
+                resource="classes"
+                recordItemId={classRecord.id}
+                variant="outline"
+                size="sm"
+              />
+              <DeleteButton
+                resource="classes"
+                recordItemId={classRecord.id}
+                variant="outline"
+                size="sm"
+              />
+            </div>
           );
         },
       },
