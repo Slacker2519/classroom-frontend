@@ -45,6 +45,17 @@ const options: CreateDataProviderOptions = {
           if (field === "subject") params.subject = value;
           if (field === "teacher") params.teacher = value;
         }
+
+        if (resource === "class-join-requests") {
+          if (field === "classId") params.classId = value;
+          if (field === "studentId") params.studentId = value;
+          if (field === "status") params.status = value;
+        }
+
+        if (resource === "enrollments") {
+          if (field === "classId") params.classId = value;
+          if (field === "studentId") params.studentId = value;
+        }
       });
 
       return params;

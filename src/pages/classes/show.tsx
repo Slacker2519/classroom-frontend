@@ -167,6 +167,17 @@ const Show = () => {
 
         <Separator />
 
+        {(isTeacher && isTeacherOfClass) || isAdmin ? (
+          <Button
+            size="lg"
+            className="w-full"
+            onClick={() => navigate(`/classes/members/${classId}`)}
+          >
+            <Users className="mr-2 h-4 w-4" />
+            View Class Members
+          </Button>
+        ) : null}
+
         {isStudent && !isEnrolled && (
           <>
             <div className="join">
