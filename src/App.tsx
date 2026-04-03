@@ -21,7 +21,7 @@ import ClassesList from "@/pages/classes/list.tsx";
 import ClassesCreate from "@/pages/classes/create.tsx";
 import ClassesShow from "@/pages/classes/show.tsx";
 import ClassEdit from "@/pages/classes/edit.tsx";
-
+import JoinRequests from "@/pages/classes/join-requests.tsx";
 import { authProvider } from "./providers/auth.ts";
 import LoginPage from "./pages/login.tsx";
 import RegisterPage from "./pages/register.tsx";
@@ -92,6 +92,10 @@ function App() {
                   <Route path="create" element={<ClassesCreate />} />
                   <Route path="show/:id" element={<ClassesShow />} />
                   <Route path="edit/:id" element={<ClassEdit />} />
+                  <Route
+                    path="join-requests/:classId"
+                    element={<JoinRequests />}
+                  />
                 </Route>
               </Route>
 

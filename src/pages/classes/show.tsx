@@ -1,5 +1,5 @@
-import { useShow } from "@refinedev/core";
-import { ClassDetails } from "@/types";
+import { useShow, useGetIdentity, useCreate, useList } from "@refinedev/core";
+import { ClassDetails, ClassJoinRequest } from "@/types";
 import {
   ShowView,
   ShowViewHeader,
@@ -10,12 +10,53 @@ import { Separator } from "@/components/ui/separator.tsx";
 import { Button } from "@/components/ui/button";
 import { AdvancedImage } from "@cloudinary/react";
 import { bannerPhoto } from "@/lib/cloudinary.ts";
+import { RoleName } from "@/lib/permissions";
+import { Loader2, Users } from "lucide-react";
+import { useParams, useNavigate } from "react-router";
 
 const Show = () => {
+  const { id: classId } = useParams<{ id: string }>();
+  const { data: identity } = useGetIdentity<{ role?: RoleName; id?: string }>();
+  const navigate = useNavigate();
   const { query } = useShow<ClassDetails>({ resource: "classes" });
-
   const classDetails = query.data?.data;
   const { isLoading, isError } = query;
+  const { mutate: createJoinRequest } = useCreate();
+
+  const { data: enrollmentData } = useList({
+    resource: "enrollments",
+    filters: [
+      {
+        field: "classId",
+        operator: "eq",
+        value: classId ? Number(classId) : undefined,
+      },
+      { field: "studentId", operator: "eq", value: identity?.id },
+    ],
+    pagination: { pageSize: 1 },
+  });
+  const isEnrolled = !!enrollmentData?.data?.length;
+
+  const { data: requestData } = useList<ClassJoinRequest>({
+    resource: "class-join-requests",
+    filters: [
+      {
+        field: "classId",
+        operator: "eq",
+        value: classId ? Number(classId) : undefined,
+      },
+      { field: "studentId", operator: "eq", value: identity?.id },
+      { field: "status", operator: "eq", value: "pending" },
+    ],
+    pagination: { pageSize: 1 },
+  });
+  const hasPendingRequest = !!requestData?.data?.length;
+
+  const isTeacherOfClass = identity?.id === classDetails?.teacher?.id;
+  const isAdmin = identity?.role === "admin";
+  const isStudent = identity?.role === "student";
+  const isTeacher = identity?.role === "teacher";
+  const canViewJoinRequests = (isTeacher && isTeacherOfClass) || isAdmin;
 
   if (isLoading || isError || !classDetails) {
     return (
@@ -126,19 +167,76 @@ const Show = () => {
 
         <Separator />
 
-        <div className="join">
-          <h2>Join Class</h2>
+        {isStudent && !isEnrolled && (
+          <>
+            <div className="join">
+              <h2>Join Class</h2>
+              {hasPendingRequest ? (
+                <p className="text-muted-foreground">
+                  You have a pending join request for this class.
+                </p>
+              ) : (
+                <ol>
+                  <li>Request to Join</li>
+                  <li>Wait for teacher to approve</li>
+                </ol>
+              )}
+            </div>
 
-          <ol>
-            <li>Ask your teacher for the invite code</li>
-            <li>Click on "Join Class" button</li>
-            <li>Paste the code and click "join"</li>
-          </ol>
-        </div>
+            {hasPendingRequest ? (
+              <Button size="lg" className="w-full" disabled>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Request Pending
+              </Button>
+            ) : (
+              <Button
+                size="lg"
+                className="w-full"
+                onClick={() => {
+                  createJoinRequest({
+                    resource: "class-join-requests",
+                    values: { classId: Number(classId) },
+                  });
+                }}
+              >
+                Request to Join
+              </Button>
+            )}
+          </>
+        )}
 
-        <Button size="lg" className="w-full">
-          Join Class
-        </Button>
+        {canViewJoinRequests && (
+          <>
+            <div className="join">
+              <h2>Enrollment Requests</h2>
+              <p className="text-muted-foreground">
+                Review and manage student join requests for this class.
+              </p>
+            </div>
+            <Button
+              size="lg"
+              className="w-full"
+              onClick={() => navigate(`/classes/join-requests/${classId}`)}
+            >
+              <Users className="mr-2 h-4 w-4" />
+              View Join Requests
+            </Button>
+          </>
+        )}
+
+        {isStudent && isEnrolled && (
+          <>
+            <div className="join">
+              <h2>You are enrolled</h2>
+              <p className="text-muted-foreground">
+                You are a member of this class.
+              </p>
+            </div>
+            <Button size="lg" className="w-full" disabled>
+              Enrolled
+            </Button>
+          </>
+        )}
       </Card>
     </ShowView>
   );
