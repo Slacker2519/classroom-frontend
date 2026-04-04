@@ -1,4 +1,4 @@
-import { useList } from "@refinedev/core";
+import { useList, useInvalidate } from "@refinedev/core";
 import { ClassJoinRequest } from "@/types";
 import { ListView } from "@/components/refine-ui/views/list-view.tsx";
 import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb.tsx";
@@ -6,19 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Check, X, Loader2 } from "lucide-react";
-import { useParams } from "react-router";
+import { Check, X, Loader2, ArrowLeft } from "lucide-react";
+import { useParams, useNavigate } from "react-router";
 import { useState } from "react";
 import { BACKEND_BASE_URL } from "@/constants";
 
 const JoinRequests = () => {
   const { classId } = useParams<{ classId: string }>();
+  const navigate = useNavigate();
+  const invalidate = useInvalidate();
   const [processingId, setProcessingId] = useState<number | null>(null);
 
   const {
     data: requestsData,
     isLoading,
-    refetch,
   } = useList<ClassJoinRequest>({
     resource: "class-join-requests",
     filters: [
@@ -51,7 +52,7 @@ const JoinRequests = () => {
       if (!response.ok) {
         throw new Error("Failed to update request");
       }
-      refetch();
+      invalidate({ resource: "class-join-requests", invalidates: ["list"] });
     } catch (error) {
       console.error("Error updating request:", error);
     } finally {
@@ -84,6 +85,17 @@ const JoinRequests = () => {
   return (
     <ListView>
       <Breadcrumb />
+
+      <div className="flex items-center gap-4 mb-4">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(`/classes/show/${classId}`)}
+        >
+          <ArrowLeft className="mr-1 h-4 w-4" />
+          Back to Class
+        </Button>
+      </div>
 
       <h1 className="page-title">Join Requests</h1>
       <div className="intro-row">
