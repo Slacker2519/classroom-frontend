@@ -61,12 +61,16 @@ const options: CreateDataProviderOptions = {
       return params;
     },
 
-    mapResponse: async (response) => {
+    mapResponse: async (response, { resource }) => {
       if (!response.ok) throw await buildHttpError(response);
 
       const payload: ListResponse = await response.clone().json();
 
-      return { data: payload.data ?? [], total: payload.pagination?.total ?? payload.data?.length ?? 0 };
+      if (resource === "class-join-requests" || resource === "enrollments") {
+        return { data: payload.data ?? [], total: payload.pagination?.total ?? payload.data?.length ?? 0 };
+      }
+
+      return payload.data ?? [];
     },
 
     getTotalCount: async (response) => {
