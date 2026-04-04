@@ -65,9 +65,8 @@ const options: CreateDataProviderOptions = {
       if (!response.ok) throw await buildHttpError(response);
 
       const payload: ListResponse = await response.clone().json();
-      console.log("mapResponse payload:", JSON.stringify(payload));
 
-      return payload.data ?? [];
+      return { data: payload.data ?? [], total: payload.pagination?.total ?? payload.data?.length ?? 0 };
     },
 
     getTotalCount: async (response) => {

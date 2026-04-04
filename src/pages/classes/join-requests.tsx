@@ -17,15 +17,13 @@ const JoinRequests = () => {
   const invalidate = useInvalidate();
   const [processingId, setProcessingId] = useState<number | null>(null);
 
-  const { data: requestsData, isLoading, error } = useList<ClassJoinRequest>({
+  const { data: requestsData, isLoading } = useList<ClassJoinRequest>({
     resource: "class-join-requests",
     filters: classId
       ? [{ field: "classId", operator: "eq", value: Number(classId) }]
       : [],
     queryOptions: { refetchOnWindowFocus: false },
   });
-
-  console.log("requestsData:", JSON.stringify(requestsData, null, 2), "error:", error);
 
   const requests = requestsData?.data || [];
 
