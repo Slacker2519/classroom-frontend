@@ -21,9 +21,12 @@ const JoinRequests = () => {
   useEffect(() => {
     if (!classId) return;
     setIsLoading(true);
-    fetch(`${BACKEND_BASE_URL}/api/class-join-requests?classId=${classId}`, {
-      credentials: "include",
-    })
+    fetch(
+      `${BACKEND_BASE_URL}/api/class-join-requests?classId=${classId}&status=pending`,
+      {
+        credentials: "include",
+      }
+    )
       .then((res) => res.json())
       .then((json) => {
         setRequests(json.data || []);
@@ -31,15 +34,6 @@ const JoinRequests = () => {
       })
       .catch(() => setIsLoading(false));
   }, [classId]);
-
-  const refetch = () => {
-    if (!classId) return;
-    fetch(`${BACKEND_BASE_URL}/api/class-join-requests?classId=${classId}`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((json) => setRequests(json.data || []));
-  };
 
   const handleResponse = async (
     requestId: number,
@@ -59,7 +53,7 @@ const JoinRequests = () => {
       if (!response.ok) {
         throw new Error("Failed to update request");
       }
-      refetch();
+      setRequests((prev) => prev.filter((r) => r.id !== requestId));
     } catch (error) {
       console.error("Error updating request:", error);
     } finally {

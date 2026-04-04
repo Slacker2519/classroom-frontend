@@ -220,12 +220,6 @@ const Show = () => {
 
         {canViewJoinRequests && (
           <>
-            <div className="join">
-              <h2>Enrollment Requests</h2>
-              <p className="text-muted-foreground">
-                Review and manage student join requests for this class.
-              </p>
-            </div>
             <Button
               size="lg"
               className="w-full"
