@@ -13,6 +13,7 @@ import { bannerPhoto } from "@/lib/cloudinary.ts";
 import { RoleName } from "@/lib/permissions";
 import { Loader2, Users } from "lucide-react";
 import { useParams, useNavigate } from "react-router";
+import { useState } from "react";
 
 const Show = () => {
   const { id: classId } = useParams<{ id: string }>();
@@ -22,6 +23,7 @@ const Show = () => {
   const classDetails = query.data?.data;
   const { isLoading, isError } = query;
   const { mutate: createJoinRequest } = useCreate();
+  const [requested, setRequested] = useState(false);
 
   const { data: enrollmentData } = useList({
     resource: "enrollments",
@@ -182,9 +184,9 @@ const Show = () => {
           <>
             <div className="join">
               <h2>Join Class</h2>
-              {hasPendingRequest ? (
+              {requested || hasPendingRequest ? (
                 <p className="text-muted-foreground">
-                  You have a pending join request for this class.
+                  Your join request is pending teacher approval.
                 </p>
               ) : (
                 <ol>
@@ -194,10 +196,10 @@ const Show = () => {
               )}
             </div>
 
-            {hasPendingRequest ? (
+            {requested || hasPendingRequest ? (
               <Button size="lg" className="w-full" disabled>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Request Pending
+                Pending
               </Button>
             ) : (
               <Button
@@ -207,6 +209,7 @@ const Show = () => {
                   createJoinRequest({
                     resource: "class-join-requests",
                     values: { classId: Number(classId) },
+                    onSuccess: () => setRequested(true),
                   });
                 }}
               >

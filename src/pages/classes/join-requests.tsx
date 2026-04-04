@@ -22,13 +22,9 @@ const JoinRequests = () => {
     isLoading,
   } = useList<ClassJoinRequest>({
     resource: "class-join-requests",
-    filters: [
-      {
-        field: "classId",
-        operator: "eq",
-        value: classId ? Number(classId) : undefined,
-      },
-    ],
+    filters: classId
+      ? [{ field: "classId", operator: "eq", value: Number(classId) }]
+      : [],
     queryOptions: { refetchOnWindowFocus: false },
   });
 

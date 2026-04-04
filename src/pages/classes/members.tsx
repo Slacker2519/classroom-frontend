@@ -3,8 +3,10 @@ import { ClassDetails } from "@/types";
 import { ListView } from "@/components/refine-ui/views/list-view.tsx";
 import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb.tsx";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { useParams } from "react-router";
+import { ArrowLeft } from "lucide-react";
+import { useParams, useNavigate } from "react-router";
 
 type Member = {
   id: string;
@@ -16,6 +18,7 @@ type Member = {
 
 const ClassMembers = () => {
   const { classId } = useParams<{ classId: string }>();
+  const navigate = useNavigate();
   const { data: classData } = useOne<ClassDetails>({
     resource: "classes",
     id: classId,
@@ -71,6 +74,17 @@ const ClassMembers = () => {
   return (
     <ListView>
       <Breadcrumb />
+
+      <div className="flex items-center gap-4 mb-4">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(`/classes/show/${classId}`)}
+        >
+          <ArrowLeft className="mr-1 h-4 w-4" />
+          Back to Class
+        </Button>
+      </div>
 
       <h1 className="page-title">Class Members</h1>
       <div className="intro-row">
