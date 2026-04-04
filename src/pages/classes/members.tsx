@@ -1,4 +1,4 @@
-import { useList, useOne } from "@refinedev/core";
+import { useOne } from "@refinedev/core";
 import { ClassDetails } from "@/types";
 import { ListView } from "@/components/refine-ui/views/list-view.tsx";
 import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb.tsx";
@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import { BACKEND_BASE_URL } from "@/constants";
 
 type Member = {
   id: string;
@@ -24,20 +26,25 @@ const ClassMembers = () => {
     id: classId,
   });
 
-  const { data: enrollmentData, isLoading } = useList({
-    resource: "enrollments",
-    filters: [
-      {
-        field: "classId",
-        operator: "eq",
-        value: classId ? Number(classId) : undefined,
-      },
-    ],
-  });
+  const [enrollments, setEnrollments] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!classId) return;
+    setIsLoading(true);
+    fetch(`${BACKEND_BASE_URL}/api/enrollments?classId=${classId}`, {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        setEnrollments(json.data || []);
+        setIsLoading(false);
+      })
+      .catch(() => setIsLoading(false));
+  }, [classId]);
 
   const classDetails = classData?.data;
   const teacher = classDetails?.teacher;
-  const enrollments = enrollmentData?.data || [];
 
   const members: Member[] = [
     ...(teacher

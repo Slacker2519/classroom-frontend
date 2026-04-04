@@ -1,5 +1,5 @@
-import { useShow, useGetIdentity, useCreate, useList } from "@refinedev/core";
-import { ClassDetails, ClassJoinRequest } from "@/types";
+import { useShow, useGetIdentity, useCreate } from "@refinedev/core";
+import { ClassDetails } from "@/types";
 import {
   ShowView,
   ShowViewHeader,
@@ -13,7 +13,8 @@ import { bannerPhoto } from "@/lib/cloudinary.ts";
 import { RoleName } from "@/lib/permissions";
 import { Loader2, Users } from "lucide-react";
 import { useParams, useNavigate } from "react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { BACKEND_BASE_URL } from "@/constants";
 
 const Show = () => {
   const { id: classId } = useParams<{ id: string }>();
@@ -25,34 +26,32 @@ const Show = () => {
   const { mutate: createJoinRequest } = useCreate();
   const [requested, setRequested] = useState(false);
 
-  const { data: enrollmentData } = useList({
-    resource: "enrollments",
-    filters: [
-      {
-        field: "classId",
-        operator: "eq",
-        value: classId ? Number(classId) : undefined,
-      },
-      { field: "studentId", operator: "eq", value: identity?.id },
-    ],
-    pagination: { pageSize: 1 },
-  });
-  const isEnrolled = !!enrollmentData?.data?.length;
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [hasPendingRequest, setHasPendingRequest] = useState(false);
 
-  const { data: requestData } = useList<ClassJoinRequest>({
-    resource: "class-join-requests",
-    filters: [
-      {
-        field: "classId",
-        operator: "eq",
-        value: classId ? Number(classId) : undefined,
-      },
-      { field: "studentId", operator: "eq", value: identity?.id },
-      { field: "status", operator: "eq", value: "pending" },
-    ],
-    pagination: { pageSize: 1 },
-  });
-  const hasPendingRequest = !!requestData?.data?.length;
+  useEffect(() => {
+    if (!classId || !identity?.id) return;
+    fetch(
+      `${BACKEND_BASE_URL}/api/enrollments?classId=${classId}&studentId=${identity.id}`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        setIsEnrolled(!!(json.data && json.data.length > 0));
+      });
+  }, [classId, identity?.id]);
+
+  useEffect(() => {
+    if (!classId || !identity?.id) return;
+    fetch(
+      `${BACKEND_BASE_URL}/api/class-join-requests?classId=${classId}&studentId=${identity.id}&status=pending`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        setHasPendingRequest(!!(json.data && json.data.length > 0));
+      });
+  }, [classId, identity?.id]);
 
   const isTeacherOfClass = identity?.id === classDetails?.teacher?.id;
   const isAdmin = identity?.role === "admin";
