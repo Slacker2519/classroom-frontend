@@ -65,6 +65,7 @@ const options: CreateDataProviderOptions = {
       if (!response.ok) throw await buildHttpError(response);
 
       const payload: ListResponse = await response.clone().json();
+      console.log("mapResponse payload:", JSON.stringify(payload));
 
       return payload.data ?? [];
     },
