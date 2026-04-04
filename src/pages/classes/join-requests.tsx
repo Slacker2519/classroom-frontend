@@ -26,6 +26,7 @@ const JoinRequests = () => {
   });
 
   const requests = requestsData?.data || [];
+  console.log("requestsData:", requestsData);
 
   const handleResponse = async (
     requestId: number,
