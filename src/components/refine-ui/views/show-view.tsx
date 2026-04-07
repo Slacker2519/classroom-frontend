@@ -4,15 +4,12 @@ import type { PropsWithChildren } from "react";
 
 import { RefreshButton } from "@/components/refine-ui/buttons/refresh";
 import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import {
-  useBack,
   useResourceParams,
   useUserFriendlyName,
 } from "@refinedev/core";
-import { ArrowLeftIcon } from "lucide-react";
 import { EditButton } from "../buttons/edit";
 
 type ShowViewProps = PropsWithChildren<{
@@ -38,7 +35,6 @@ export const ShowViewHeader = ({
   wrapperClassName,
   headerClassName,
 }: ShowViewHeaderProps) => {
-  const back = useBack();
 
   const getUserFriendlyName = useUserFriendlyName();
 
@@ -75,9 +71,6 @@ export const ShowViewHeader = ({
         )}
       >
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={back}>
-            <ArrowLeftIcon className="h-4 w-4" />
-          </Button>
           <h2 className="text-2xl font-bold">{title}</h2>
         </div>
 
