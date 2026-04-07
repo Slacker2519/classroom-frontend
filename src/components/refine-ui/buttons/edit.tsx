@@ -28,6 +28,10 @@ type EditButtonProps = {
    * `meta` property is used when creating the URL for the related action and path.
    */
   meta?: Record<string, unknown>;
+  /**
+   * Callback fired instead of navigating when provided.
+   */
+  onEdit?: () => void;
 } & React.ComponentProps<typeof Button>;
 
 export const EditButton = React.forwardRef<
@@ -50,21 +54,28 @@ export const EditButton = React.forwardRef<
 
     if (isHidden) return null;
 
+    const handleClick = (e: React.PointerEvent<HTMLButtonElement>) => {
+      if (isDisabled) {
+        e.preventDefault();
+        return;
+      }
+      if (onEdit) {
+        e.preventDefault();
+        onEdit();
+        return;
+      }
+      if (onClick) {
+        e.preventDefault();
+        onClick(e);
+      }
+    };
+
     return (
       <Button {...rest} ref={ref} disabled={isDisabled} asChild>
         <LinkComponent
           to={to}
           replace={false}
-          onClick={(e: React.PointerEvent<HTMLButtonElement>) => {
-            if (isDisabled) {
-              e.preventDefault();
-              return;
-            }
-            if (onClick) {
-              e.preventDefault();
-              onClick(e);
-            }
-          }}
+          onClick={handleClick}
         >
           {children ?? (
             <div className="flex items-center gap-2 font-semibold">

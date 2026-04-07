@@ -56,7 +56,11 @@ export const RefreshButton = React.forwardRef<
             e.preventDefault();
             return;
           }
-          refresh();
+          if (rest.onClick) {
+            rest.onClick(e);
+          } else {
+            refresh();
+          }
         }}
         {...rest}
         ref={ref}

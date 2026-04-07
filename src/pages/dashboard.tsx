@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BACKEND_BASE_URL } from "@/constants";
 import { useNavigate } from "react-router";
 import { RoleName } from "@/lib/permissions";
-import { Loader2, Edit2, X, Check } from "lucide-react";
+import { Loader2, X, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import UploadWidget from "@/components/upload-widget.tsx";
 import { UploadWidgetValue } from "@/types";
@@ -47,7 +47,7 @@ export default function Dashboard() {
   const [editImage, setEditImage] = useState<UploadWidgetValue | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const fetchProfile = () => {
     if (!identity?.id) return;
     setIsLoading(true);
     fetch(`${BACKEND_BASE_URL}/api/users/user`, {
@@ -61,6 +61,10 @@ export default function Dashboard() {
         setIsLoading(false);
       })
       .catch(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    fetchProfile();
   }, [identity?.id]);
 
   const handleSave = async () => {
@@ -109,7 +113,7 @@ export default function Dashboard() {
   if (isLoading) {
     return (
       <ShowView>
-        <ShowViewHeader resource="dashboard" title="Dashboard" />
+        <ShowViewHeader resource="dashboard" title="Dashboard" onEdit={() => setIsEditing(true)} onRefresh={fetchProfile} />
         <p className="state-message">Loading profile...</p>
       </ShowView>
     );
@@ -118,7 +122,7 @@ export default function Dashboard() {
   if (!profile) {
     return (
       <ShowView>
-        <ShowViewHeader resource="dashboard" title="Dashboard" />
+        <ShowViewHeader resource="dashboard" title="Dashboard" onEdit={() => setIsEditing(true)} onRefresh={fetchProfile} />
         <p className="state-message">Failed to load profile.</p>
       </ShowView>
     );
@@ -126,7 +130,7 @@ export default function Dashboard() {
 
   return (
     <ShowView>
-      <ShowViewHeader resource="dashboard" title="Dashboard" />
+      <ShowViewHeader resource="dashboard" title="Dashboard" onEdit={() => setIsEditing(true)} onRefresh={fetchProfile} />
 
       <Card className="p-6 max-w-2xl">
         <div className="flex items-start justify-between mb-6">
@@ -141,16 +145,6 @@ export default function Dashboard() {
               <Badge variant={roleVariant} className={cn("mt-1")}>{roleLabel}</Badge>
             </div>
           </div>
-          {!isEditing && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditing(true)}
-            >
-              <Edit2 className="mr-1 h-4 w-4" />
-              Edit Profile
-            </Button>
-          )}
         </div>
 
         <Separator className="my-4" />

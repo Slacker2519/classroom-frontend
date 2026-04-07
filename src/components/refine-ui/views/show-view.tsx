@@ -27,6 +27,8 @@ type ShowViewHeaderProps = PropsWithChildren<{
   title?: string;
   wrapperClassName?: string;
   headerClassName?: string;
+  onEdit?: () => void;
+  onRefresh?: () => void;
 }>;
 
 export const ShowViewHeader = ({
@@ -34,6 +36,8 @@ export const ShowViewHeader = ({
   title: titleFromProps,
   wrapperClassName,
   headerClassName,
+  onEdit,
+  onRefresh,
 }: ShowViewHeaderProps) => {
 
   const getUserFriendlyName = useUserFriendlyName();
@@ -79,12 +83,16 @@ export const ShowViewHeader = ({
             variant="outline"
             recordItemId={recordItemId}
             resource={resourceName}
+            onClick={onRefresh}
           />
-          <EditButton
-            variant="outline"
-            recordItemId={recordItemId}
-            resource={resourceName}
-          />
+          {onEdit && (
+            <EditButton
+              variant="outline"
+              recordItemId={recordItemId}
+              resource={resourceName}
+              onEdit={onEdit}
+            />
+          )}
         </div>
       </div>
     </div>
