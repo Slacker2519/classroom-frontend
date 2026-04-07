@@ -19,15 +19,12 @@ export function UserAvatar() {
     return <Skeleton className={cn("h-10", "w-10", "rounded-full")} />;
   }
 
-  const initials = getInitials(user.fullName);
+  const { fullName, avatar } = user;
 
   return (
     <Avatar className={cn("h-10", "w-10")}>
-      {user.avatar ? (
-        <AvatarImage src={user.avatar} alt={user.fullName} />
-      ) : (
-        <AvatarFallback>{initials}</AvatarFallback>
-      )}
+      {avatar && <AvatarImage src={avatar} alt={fullName} />}
+      <AvatarFallback>{getInitials(fullName)}</AvatarFallback>
     </Avatar>
   );
 }
