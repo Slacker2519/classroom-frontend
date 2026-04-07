@@ -12,6 +12,8 @@ import { useNavigate } from "react-router";
 import { RoleName } from "@/lib/permissions";
 import { Loader2, Edit2, X, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import UploadWidget from "@/components/upload-widget.tsx";
+import { UploadWidgetValue } from "@/types";
 
 type UserProfile = {
   id: string;
@@ -42,7 +44,7 @@ export default function Dashboard() {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editName, setEditName] = useState("");
-  const [editImage, setEditImage] = useState("");
+  const [editImage, setEditImage] = useState<UploadWidgetValue | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,7 +57,7 @@ export default function Dashboard() {
       .then((json) => {
         setProfile(json.data);
         setEditName(json.data?.name || "");
-        setEditImage(json.data?.image || "");
+        setEditImage(json.data?.image ? { url: json.data.image, publicId: json.data.imageCldPubId || "" } : null);
         setIsLoading(false);
       })
       .catch(() => setIsLoading(false));
@@ -68,7 +70,7 @@ export default function Dashboard() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ name: editName, image: editImage }),
+        body: JSON.stringify({ name: editName, image: editImage?.url || null, imageCldPubId: editImage?.publicId || null }),
       });
       const json = await res.json();
       if (json.data) {
@@ -85,7 +87,7 @@ export default function Dashboard() {
   const handleCancel = () => {
     if (profile) {
       setEditName(profile.name);
-      setEditImage(profile.image || "");
+      setEditImage(profile.image ? { url: profile.image, publicId: (profile as any).imageCldPubId || "" } : null);
     }
     setIsEditing(false);
   };
@@ -164,13 +166,13 @@ export default function Dashboard() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Image URL</label>
-              <Input
-                value={editImage}
-                onChange={(e) => setEditImage(e.target.value)}
-                className="mt-1"
-                placeholder="https://..."
-              />
+              <label className="text-sm font-medium">Profile Image</label>
+              <div className="mt-1">
+                <UploadWidget
+                  value={editImage}
+                  onChange={(file) => setEditImage(file)}
+                />
+              </div>
             </div>
             <div className="flex gap-2">
               <Button
