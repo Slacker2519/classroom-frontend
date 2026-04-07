@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useGetIdentity } from "@refinedev/core";
-import { ShowView, ShowViewHeader } from "@/components/refine-ui/views/show-view.tsx";
+import {
+  ShowView,
+  ShowViewHeader,
+} from "@/components/refine-ui/views/show-view.tsx";
 import { Card } from "@/components/ui/card.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
 import { Button } from "@/components/ui/button";
@@ -21,6 +24,7 @@ type UserProfile = {
   email: string;
   role: RoleName;
   image?: string | null;
+  imageCldPubId?: string | null;
   createdAt: string;
   classes: {
     id: number;
@@ -57,7 +61,11 @@ export default function Dashboard() {
       .then((json) => {
         setProfile(json.data);
         setEditName(json.data?.name || "");
-        setEditImage(json.data?.image ? { url: json.data.image, publicId: json.data.imageCldPubId || "" } : null);
+        setEditImage(
+          json.data?.image
+            ? { url: json.data.image, publicId: json.data.imageCldPubId || "" }
+            : null
+        );
         setIsLoading(false);
       })
       .catch(() => setIsLoading(false));
@@ -74,11 +82,15 @@ export default function Dashboard() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ name: editName, image: editImage?.url || null, imageCldPubId: editImage?.publicId || null }),
+        body: JSON.stringify({
+          name: editName,
+          image: editImage?.url || null,
+          imageCldPubId: editImage?.publicId || null,
+        }),
       });
       const json = await res.json();
       if (json.data) {
-        setProfile((prev) => prev ? { ...prev, ...json.data } : prev);
+        setProfile((prev) => (prev ? { ...prev, ...json.data } : prev));
       }
       setIsEditing(false);
     } catch (e) {
@@ -91,7 +103,14 @@ export default function Dashboard() {
   const handleCancel = () => {
     if (profile) {
       setEditName(profile.name);
-      setEditImage(profile.image ? { url: profile.image, publicId: (profile as any).imageCldPubId || "" } : null);
+      setEditImage(
+        profile.image
+          ? {
+              url: profile.image,
+              publicId: profile.imageCldPubId || "",
+            }
+          : null
+      );
     }
     setIsEditing(false);
   };
@@ -108,12 +127,21 @@ export default function Dashboard() {
   const isTeacher = profile?.role === "teacher";
   const isAdmin = profile?.role === "admin";
   const roleLabel = isAdmin ? "Admin" : isTeacher ? "Teacher" : "Student";
-  const roleVariant: "default" | "secondary" | "destructive" = isAdmin ? "destructive" : isTeacher ? "default" : "secondary";
+  const roleVariant: "default" | "secondary" | "destructive" = isAdmin
+    ? "destructive"
+    : isTeacher
+    ? "default"
+    : "secondary";
 
   if (isLoading) {
     return (
       <ShowView>
-        <ShowViewHeader resource="dashboard" title="Dashboard" onEdit={() => setIsEditing(true)} onRefresh={fetchProfile} />
+        <ShowViewHeader
+          resource="dashboard"
+          title="Dashboard"
+          onEdit={() => setIsEditing(true)}
+          onRefresh={fetchProfile}
+        />
         <p className="state-message">Loading profile...</p>
       </ShowView>
     );
@@ -122,7 +150,12 @@ export default function Dashboard() {
   if (!profile) {
     return (
       <ShowView>
-        <ShowViewHeader resource="dashboard" title="Dashboard" onEdit={() => setIsEditing(true)} onRefresh={fetchProfile} />
+        <ShowViewHeader
+          resource="dashboard"
+          title="Dashboard"
+          onEdit={() => setIsEditing(true)}
+          onRefresh={fetchProfile}
+        />
         <p className="state-message">Failed to load profile.</p>
       </ShowView>
     );
@@ -130,19 +163,31 @@ export default function Dashboard() {
 
   return (
     <ShowView>
-      <ShowViewHeader resource="dashboard" title="Dashboard" onEdit={() => setIsEditing(true)} onRefresh={fetchProfile} />
+      <ShowViewHeader
+        resource="dashboard"
+        title="Dashboard"
+        onEdit={() => setIsEditing(true)}
+        onRefresh={fetchProfile}
+      />
 
       <Card className="p-6 max-w-2xl">
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-center gap-4">
             <Avatar className={cn("h-20", "w-20")}>
-              <AvatarImage src={profile.image || undefined} alt={profile.name} />
-              <AvatarFallback className={cn("text-lg")}>{getInitials(profile.name)}</AvatarFallback>
+              <AvatarImage
+                src={profile.image || undefined}
+                alt={profile.name}
+              />
+              <AvatarFallback className={cn("text-lg")}>
+                {getInitials(profile.name)}
+              </AvatarFallback>
             </Avatar>
             <div>
               <h2 className="text-xl font-bold">{profile.name}</h2>
               <p className="text-sm text-muted-foreground">{profile.email}</p>
-              <Badge variant={roleVariant} className={cn("mt-1")}>{roleLabel}</Badge>
+              <Badge variant={roleVariant} className={cn("mt-1")}>
+                {roleLabel}
+              </Badge>
             </div>
           </div>
         </div>

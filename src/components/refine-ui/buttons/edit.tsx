@@ -70,6 +70,31 @@ export const EditButton = React.forwardRef<
       }
     };
 
+    if (onEdit) {
+      return (
+        <Button
+          {...rest}
+          ref={ref}
+          disabled={isDisabled}
+          onClick={(e) => {
+            if (!isDisabled) {
+              onEdit();
+            }
+            if (rest.onClick) {
+              rest.onClick(e);
+            }
+          }}
+        >
+          {children ?? (
+            <div className="flex items-center gap-2 font-semibold">
+              <Pencil className="h-4 w-4" />
+              <span>{label}</span>
+            </div>
+          )}
+        </Button>
+      );
+    }
+
     return (
       <Button {...rest} ref={ref} disabled={isDisabled} asChild>
         <LinkComponent
