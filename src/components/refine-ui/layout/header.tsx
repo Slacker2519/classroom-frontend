@@ -11,9 +11,9 @@ import { cn } from "@/lib/utils";
 import {
   useActiveAuthProvider,
   useLogout,
-  useNavigate,
   useRefineOptions,
 } from "@refinedev/core";
+import { useNavigate } from "react-router";
 import { LogOutIcon, UserIcon } from "lucide-react";
 
 export const Header = () => {
