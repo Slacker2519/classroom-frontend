@@ -11,9 +11,10 @@ import { cn } from "@/lib/utils";
 import {
   useActiveAuthProvider,
   useLogout,
+  useNavigate,
   useRefineOptions,
 } from "@refinedev/core";
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, UserIcon } from "lucide-react";
 
 export const Header = () => {
   const { isMobile } = useSidebar();
@@ -119,6 +120,7 @@ function MobileHeader() {
 
 const UserDropdown = () => {
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
+  const navigate = useNavigate();
 
   const authProvider = useActiveAuthProvider();
 
@@ -132,6 +134,10 @@ const UserDropdown = () => {
         <UserAvatar />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => navigate("/")}>
+          <UserIcon className="mr-2 h-4 w-4" />
+          My Profile
+        </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
             logout();
