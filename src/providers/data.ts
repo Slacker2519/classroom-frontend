@@ -186,7 +186,7 @@ async function deduplicatedFetch(
 
   const existing = pending.get(cacheKey);
   if (existing && now - existing.timestamp < 5000) {
-    return existing.response;
+    return (await existing.response).clone();
   }
 
   const p = fetchWithRetry(url, opts, attempt);
