@@ -127,45 +127,83 @@ const options: CreateDataProviderOptions = {
 
 const originalFetch = globalThis.fetch.bind(globalThis);
 
+type PendingRequest = {
+  response: Promise<Response>;
+  timestamp: number;
+};
+
+const pending = new Map<string, PendingRequest>();
+
 async function fetchWithRetry(
   url: string,
-  options: RequestInit,
+  opts: RequestInit,
   attempt = 1
 ): Promise<Response> {
   try {
     const res = await originalFetch(url, {
-      ...options,
+      ...opts,
       credentials: "include",
     });
 
     if (res.ok) return res;
 
-    if (res.status >= 400 && res.status < 500) return res;
-
     if (res.status >= 500 && attempt < 4) {
-      const baseDelay = 1500;
       const delay = Math.floor(
-        baseDelay * Math.pow(2, attempt - 1) + Math.random() * baseDelay
+        1500 * Math.pow(2, attempt - 1) + Math.random() * 1500
       );
       await new Promise((r) => setTimeout(r, delay));
-      return fetchWithRetry(url, { ...options, credentials: "include" }, attempt + 1);
+      return fetchWithRetry(
+        url,
+        { ...opts, credentials: "include" },
+        attempt + 1
+      );
     }
 
     return res;
   } catch (err) {
     if (attempt < 4) {
-      const baseDelay = 1500;
       const delay = Math.floor(
-        baseDelay * Math.pow(2, attempt - 1) + Math.random() * baseDelay
+        1500 * Math.pow(2, attempt - 1) + Math.random() * 1500
       );
       await new Promise((r) => setTimeout(r, delay));
-      return fetchWithRetry(url, { ...options, credentials: "include" }, attempt + 1);
+      return fetchWithRetry(
+        url,
+        { ...opts, credentials: "include" },
+        attempt + 1
+      );
     }
     throw err;
   }
 }
 
-globalThis.fetch = fetchWithRetry as typeof globalThis.fetch;
+async function deduplicatedFetch(
+  url: string,
+  opts: RequestInit,
+  attempt = 1
+): Promise<Response> {
+  const cacheKey = `${url}|${JSON.stringify(opts)}`;
+  const now = Date.now();
+
+  const existing = pending.get(cacheKey);
+  if (existing && now - existing.timestamp < 5000) {
+    return existing.response;
+  }
+
+  const p = fetchWithRetry(url, opts, attempt);
+  pending.set(cacheKey, { response: p, timestamp: now });
+
+  try {
+    return await p;
+  } finally {
+    setTimeout(() => {
+      if (pending.get(cacheKey)?.response === p) {
+        pending.delete(cacheKey);
+      }
+    }, 5000);
+  }
+}
+
+globalThis.fetch = deduplicatedFetch as typeof globalThis.fetch;
 
 const { dataProvider: baseDataProvider } = createDataProvider(
   BACKEND_BASE_URL,
