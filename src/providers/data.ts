@@ -61,15 +61,10 @@ const options: CreateDataProviderOptions = {
       return params;
     },
 
-    mapResponse: async (response, { resource }) => {
+    mapResponse: async (response) => {
       if (!response.ok) throw await buildHttpError(response);
 
       const payload: ListResponse = await response.clone().json();
-
-      if (resource === "class-join-requests" || resource === "enrollments") {
-        return { data: payload.data ?? [], total: payload.pagination?.total ?? payload.data?.length ?? 0 };
-      }
-
       return payload.data ?? [];
     },
 
@@ -129,6 +124,48 @@ const options: CreateDataProviderOptions = {
     },
   },
 };
+
+const originalFetch = globalThis.fetch.bind(globalThis);
+
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  attempt = 1
+): Promise<Response> {
+  try {
+    const res = await originalFetch(url, {
+      ...options,
+      credentials: "include",
+    });
+
+    if (res.ok) return res;
+
+    if (res.status >= 400 && res.status < 500) return res;
+
+    if (res.status >= 500 && attempt < 4) {
+      const baseDelay = 1500;
+      const delay = Math.floor(
+        baseDelay * Math.pow(2, attempt - 1) + Math.random() * baseDelay
+      );
+      await new Promise((r) => setTimeout(r, delay));
+      return fetchWithRetry(url, { ...options, credentials: "include" }, attempt + 1);
+    }
+
+    return res;
+  } catch (err) {
+    if (attempt < 4) {
+      const baseDelay = 1500;
+      const delay = Math.floor(
+        baseDelay * Math.pow(2, attempt - 1) + Math.random() * baseDelay
+      );
+      await new Promise((r) => setTimeout(r, delay));
+      return fetchWithRetry(url, { ...options, credentials: "include" }, attempt + 1);
+    }
+    throw err;
+  }
+}
+
+globalThis.fetch = fetchWithRetry as typeof globalThis.fetch;
 
 const { dataProvider: baseDataProvider } = createDataProvider(
   BACKEND_BASE_URL,
