@@ -135,12 +135,14 @@ type PendingRequest = {
 const pending = new Map<string, PendingRequest>();
 
 async function fetchWithRetry(
-  url: string,
+  url: string | URL | Request,
   opts: RequestInit,
   attempt = 1
 ): Promise<Response> {
+  const urlStr = typeof url === "string" ? url : url.toString();
+
   try {
-    const res = await originalFetch(url, {
+    const res = await originalFetch(urlStr, {
       ...opts,
       credentials: "include",
     });
@@ -153,7 +155,7 @@ async function fetchWithRetry(
       );
       await new Promise((r) => setTimeout(r, delay));
       return fetchWithRetry(
-        url,
+        urlStr,
         { ...opts, credentials: "include" },
         attempt + 1
       );
@@ -167,7 +169,7 @@ async function fetchWithRetry(
       );
       await new Promise((r) => setTimeout(r, delay));
       return fetchWithRetry(
-        url,
+        urlStr,
         { ...opts, credentials: "include" },
         attempt + 1
       );
@@ -177,15 +179,17 @@ async function fetchWithRetry(
 }
 
 async function deduplicatedFetch(
-  url: string,
+  url: string | URL | Request,
   opts: RequestInit,
   attempt = 1
 ): Promise<Response> {
-  if (url.includes("/api/auth/")) {
-    return fetchWithRetry(url, opts, attempt);
+  const urlStr = typeof url === "string" ? url : url.toString();
+
+  if (urlStr.includes("/api/auth/")) {
+    return fetchWithRetry(urlStr, opts, attempt);
   }
 
-  const cacheKey = `${url}|${JSON.stringify(opts)}`;
+  const cacheKey = `${urlStr}|${JSON.stringify(opts)}`;
   const now = Date.now();
 
   const existing = pending.get(cacheKey);
@@ -193,7 +197,7 @@ async function deduplicatedFetch(
     return (await existing.response).clone();
   }
 
-  const p = fetchWithRetry(url, opts, attempt);
+  const p = fetchWithRetry(urlStr, opts, attempt);
   pending.set(cacheKey, { response: p, timestamp: now });
 
   try {
