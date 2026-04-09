@@ -139,7 +139,9 @@ async function fetchWithRetry(
   opts: RequestInit,
   attempt = 1
 ): Promise<Response> {
-  const urlStr = typeof url === "string" ? url : url.toString();
+  const urlStr = typeof url === "string"
+    ? url
+    : (url instanceof Request ? url.url : String(url));
 
   try {
     const res = await originalFetch(urlStr, {
@@ -183,7 +185,9 @@ async function deduplicatedFetch(
   opts: RequestInit,
   attempt = 1
 ): Promise<Response> {
-  const urlStr = typeof url === "string" ? url : url.toString();
+  const urlStr = typeof url === "string"
+    ? url
+    : (url instanceof Request ? url.url : String(url));
 
   if (urlStr.includes("/api/auth/")) {
     return fetchWithRetry(urlStr, opts, attempt);
