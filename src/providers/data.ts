@@ -181,6 +181,10 @@ async function deduplicatedFetch(
   opts: RequestInit,
   attempt = 1
 ): Promise<Response> {
+  if (url.includes("/api/auth/")) {
+    return fetchWithRetry(url, opts, attempt);
+  }
+
   const cacheKey = `${url}|${JSON.stringify(opts)}`;
   const now = Date.now();
 
